@@ -4,7 +4,12 @@ const bcrypt = require("bcrypt");
 
 
 // create our User model
-class User extends Model {}
+class User extends Model {
+    //method to run on instance per data (per user) to check password
+    checkPassword(loginPw) {
+        return bcrypt.compareSync(loginPw, this.password);
+    }
+}
 
 // define table columns and configuration
 User.init(
