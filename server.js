@@ -12,6 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(routes);
 
 // turn on connection to db and server
+//changing the value of "force" to "true"syncs database connection and model defs&associations. Meaning if there are changes to associations, tables will recreate."false" is better than "true" bc dropping all tables constantly could be annoying
 sequelize.sync({ force: false }).then(() => {
   app.listen(PORT, () => console.log('Now listening'));
 });
