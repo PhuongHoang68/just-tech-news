@@ -1,23 +1,34 @@
-const { Post, User, Vote}= require("../../models");
+const { Post, User, Vote, Comment}= require("../../models");
 const router = require("express").Router();
 const sequelize = require("../../config/connection");
 
 // get all posts
 router.get('/', (req, res) => {
-    console.log('======================');
-    Post.findAll({
-      // Query configuration
-      attributes: ["id", "post_url", "title", "created_at",
-      [sequelize.literal('(SELECT COUNT(*) FROM vote WHERE post.id=vote.post_id)'), "vote_count"]
+  Post.findAll({
+    order: [['created_at', 'DESC']],
+    attributes: [
+      'id',
+      'post_url',
+      'title',
+      'created_at',
+      [sequelize.literal('(SELECT COUNT(*) FROM vote WHERE post.id = vote.post_id)'), 'vote_count']
     ],
-      order: [["created at", "DESC"]],
-      include: [
-        {
-            model: User,
-            attributes: ["username"]
+    include: [
+      // include the Comment model here:
+      {
+        model: Comment,
+        attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
+        include: {
+          model: User,
+          attributes: ['username']
         }
-      ]
-    })
+      },
+      {
+        model: User,
+        attributes: ['username']
+      }
+    ]
+   })
     .then(dbPostData => res.json(dbPostData))
     .catch(err=>{
         console.log(err);
@@ -37,6 +48,14 @@ router.get('/', (req, res) => {
       sequelize.literal('(SELECT COUNT(*) FROM vote WHERE post.id = vote.post_id)'), "vote_count"
     ]],
       include: [
+        {
+          model: Comment,
+          attributes: ['id', 'comment_text', 'post_id', 'user_id', 'created_at'],
+        include: {
+          model: User,
+          attributes: ['username']}
+
+        },
         {
           model: User,
           attributes: ['username']
@@ -81,6 +100,9 @@ Post.upvote(red.body, {Vote})
     });
   });
   
+
+
+  
   router.put('/:id', (req, res) => {
     Post.update(
       {
@@ -105,6 +127,9 @@ Post.upvote(red.body, {Vote})
       });
   });
   
+
+
+
   router.delete('/:id', (req, res) => {
     Post.destroy({
       where: {
