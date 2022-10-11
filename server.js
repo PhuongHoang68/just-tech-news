@@ -1,5 +1,5 @@
 const express = require('express');
-const router = require('./controllers');
+const routes = require('./controllers');
 const sequelize = require('./config/connection');
 const path = require("path");
 const exphbs = require("express-handlebars");
@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
 // turn on routes
-app.use(router);
+app.use(routes);
 
 // turn on connection to db and server
 //changing the value of "force" to "true"syncs database connection and model defs&associations. Meaning if there are changes to associations, tables will recreate."false" is better than "true" bc dropping all tables constantly could be annoying
